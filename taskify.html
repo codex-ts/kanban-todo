@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="taskify.css">
+  <title>Document</title>
+</head>
+
+<body>
+  
+
+<div class="board" id="board">
+  <div class="task-column" id="todo">
+    <h2>To Do</h2>
+    
+    <div class="task-input" style="display: none;">
+      <input type="text" placeholder="Enter task..." class="task-text" />
+      <button class="submit-task">Enter</button>
+    </div>
+
+    <div class="task-list" id="todo-list"></div>
+    <button class="add-task" data-column="todo-list">Add Task</button>
+  </div>
+
+
+  <div class="task-column" id="inprogress">
+    <h2>In Progress</h2>
+    
+    <div class="task-input" style="display: none;">
+      <input type="text" placeholder="Enter task..." class="task-text" />
+      <button class="submit-task">Enter</button>
+    </div>
+
+    <div class="task-list" id="inprogress-list"></div>
+    <button class="add-task" data-column="inprogress-list">Add Task</button>
+  </div>
+
+
+  <div class="task-column" id="finished">
+    <h2>Finished</h2>
+    
+    <div class="task-input" style="display: none;">
+      <input type="text" placeholder="Enter task..." class="task-text" />
+      <button class="submit-task">Enter</button>
+    </div>
+    
+    <div class="task-list" id="finished-list"></div>
+    <button class="add-task" data-column="finished-list">Add Task</button>
+  </div>
+</div>
+
+
+
+<script>
+
+
+const buttons = document.querySelectorAll('.add-task')
+let counter = 0
+
+
+buttons.forEach(button=>{
+
+    button.addEventListener('click',()=>{
+
+    const columnID = button.getAttribute('data-column')
+    const tasktype = document.getElementById(columnID)
+
+    const column = button.parentElement;
+    const inputdiv = column.querySelector('.task-input')
+    inputdiv.style.display = 'flex'
+    inputdiv.querySelector('input').focus();
+
+  })
+
+      const column = button.parentElement;
+      const inputdiv = column.querySelector('.task-input');
+      const input = inputdiv.querySelector('input');
+      const enter = column.querySelector('.submit-task');
+      const columnID = button.getAttribute('data-column');
+      const tasktype = document.getElementById(columnID);
+
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') enter.click();
+      });
+
+
+      enter.addEventListener('click',()=>{
+        const input = inputdiv.querySelector('input');
+      if (input.value.trim() === '') {
+        alert('Please enter a task');
+        return;
+      }
+      
+    else{
+
+    const newtask = document.createElement('div')
+    const newtaskspan = document.createElement('span')
+    const deletetask = document.createElement('button')
+    const edit = document.createElement('button')
+    edit.textContent = 'Edit'
+    deletetask.textContent = 'Delete'
+    newtaskspan.textContent = input.value;
+    newtask.className = 'task';
+    newtask.setAttribute('draggable','true')
+    newtask.setAttribute('id',counter)
+    counter++
+    
+    newtask.appendChild(newtaskspan)   
+    newtask.appendChild(edit)
+    newtask.appendChild(deletetask)
+    tasktype.appendChild(newtask)   
+
+    
+    
+    deletetask.addEventListener('click',()=>{
+      newtask.remove()
+    })
+    
+    edit.addEventListener('click',()=>{
+
+    newtask.classList.add('editing');
+
+
+    newtaskspan.style.display = 'none';
+    edit.style.display = 'none';
+    deletetask.style.display = 'none';
+
+
+
+      const editInput = document.createElement('input')
+      editInput.value = newtaskspan.textContent
+      const save = document.createElement('button')
+      save.textContent = 'Save'
+      const editcontainer = document.createElement('div')
+      editcontainer.appendChild(editInput)
+      editcontainer.appendChild(save)
+            editcontainer.style.opacity = '0';
+            editcontainer.style.maxHeight = '0';
+            editcontainer.style.transform = 'translateY(-5px)';
+      newtask.replaceChild(editcontainer, newtaskspan)
+        setTimeout(() => {
+            editcontainer.style.opacity = '1';
+            editcontainer.style.maxHeight = '100px';
+            editcontainer.style.transform = 'translateY(0)';
+          }, 10);
+
+      const cancel = document.createElement('button');
+      cancel.textContent = 'Cancel';
+      editcontainer.appendChild(cancel);
+
+      editInput.focus();
+      editcontainer.classList.add('edit-container');
+
+      // newtask.replaceWith(editcontainer)
+
+      editInput.addEventListener('keydown', (e) => {
+       if (e.key === 'Enter') save.click();
+      });
+
+      cancel.addEventListener('click',()=>{
+        newtask.replaceChild(newtaskspan, editcontainer)
+        newtaskspan.style.display = '';
+        edit.style.display = '';
+        deletetask.style.display = '';
+      })
+
+      save.addEventListener('click',()=>{
+      if (editInput.value.trim() === '') {
+        alert('Please enter a task');
+        return;
+      }
+        newtaskspan.textContent = editInput.value
+        editcontainer.style.opacity = '0';
+        editcontainer.style.maxHeight = '0';
+        editcontainer.style.transform = 'translateY(-5px)';
+
+        setTimeout(() => {
+          newtask.replaceChild(newtaskspan, editcontainer);
+          newtaskspan.style.display = '';
+          edit.style.display = '';
+          deletetask.style.display = '';
+          newtask.classList.remove('editing');
+        }, 300); 
+
+        // newtask.replaceChild(newtaskspan, editcontainer)
+        // editcontainer.replaceWith(newtask)
+        newtaskspan.style.display = '';
+        edit.style.display = '';
+        deletetask.style.display = '';
+        newtask.classList.remove('editing');
+      })
+
+    })
+
+
+    input.value = '';
+    inputdiv.style.display = 'none'; 
+        
+    newtask.addEventListener('dragstart',(event)=>{
+    event.dataTransfer.setData('text/plain',event.target.id)
+       })
+      }
+    })
+  })
+
+    
+  
+const dropzones = document.querySelectorAll('.task-list')
+dropzones.forEach(zone => {
+  zone.addEventListener('dragover',(event)=>{
+    event.preventDefault();
+  })
+
+  zone.addEventListener('drop',(event)=>{
+    event.preventDefault();
+
+    const taskID = event.dataTransfer.getData('text/plain')
+    const draggedTask = document.getElementById(taskID)
+
+    zone.appendChild(draggedTask)
+  })
+      
+})
+
+
+
+</script>
+
+
+
+</body>
+</html>
